@@ -106,7 +106,35 @@ void imprime_arquivo(char *name) {
 }
 
 void join(char *nome_arq_dept, char *nome_arq_funcionarios, char *nome_arq_join) {
-    //TODO: Implementar essa função
+    FILE *arq_dept = fopen(nome_arq_dept, "r");
+    FILE *arq_func = fopen(nome_arq_funcionarios, "r");
+    FILE *arq_join = fopen(nome_arq_join, "w");
+
+    if (arq_dept == NULL || arq_func == NULL || arq_join == NULL) {
+        if (arq_dept != NULL) fclose(arq_dept);
+        if (arq_func != NULL) fclose(arq_func);
+        if (arq_join != NULL) fclose(arq_join);
+        return;
+    }
+
+    TDepartamento *dept;
+    while ((dept = le_departamento(arq_dept)) != NULL) {
+        rewind(arq_func);
+        TFuncionario *func;
+        while ((func = le_funcionario(arq_func)) != NULL) {
+            if (dept->cod_dept == func->cod_dept) {
+                fprintf(arq_join, "%d;%d;%s;%d;%s;\n",
+                        dept->cod_dept, dept->sala, dept->nome,
+                        func->cod_func, func->nome);
+            }
+            free(func);
+        }
+        free(dept);
+    }
+
+    fclose(arq_dept);
+    fclose(arq_func);
+    fclose(arq_join);
 }
 
 int main() {
